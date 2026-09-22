@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "yt-downloader"
+version = "0.1.0"
+description = "Qt application to download YouTube videos as high-quality MP3 or MP4 files"
+authors = ["Bikiran Das"]
+license = "Bikiran Das"
+readme = "README.md"
+packages = [{ include = "app" }]
+
+[tool.poetry.dependencies]
+python = ">=3.11,<=3.14"
+pyqt6 = "^6.10.2"
+yt-dlp = "^2026.8.19"
+
+[tool.poetry.scripts]
+yt-downloader = "app.main:main"
+
+[[tool.poetry.source]]
+name = "pypi"
+priority = "supplemental"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
