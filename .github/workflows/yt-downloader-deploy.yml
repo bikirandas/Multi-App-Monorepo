@@ -84,6 +84,11 @@ jobs:
           role-to-assume: ${{ env.DEPLOY_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
 
+      # Fails loudly here if the OIDC trust or role is wrong, instead of
+      # letting later Terraform steps silently not run.
+      - name: Verify AWS identity
+        run: aws sts get-caller-identity
+
       - name: Terraform init (reconfigure S3 backend)
         working-directory: ${{ env.TERRAFORM_DIR }}
         env:

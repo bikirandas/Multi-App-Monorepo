@@ -27,7 +27,7 @@ terraform apply \
 | Name | Description | Default |
 |---|---|---|
 | `bucket_name` | S3 bucket name | `boxndots-products-prod` |
-| `bucket_region` | AWS region | `us-east-1` |
+| `bucket_region` | AWS region | `ap-south-1` |
 | `environment` | Environment tag | `production` |
 | `executable_source_path` | Local path to `yt-downloader.exe` | `../../../YT-Downloader/dist/yt-downloader.exe` |
 | `object_key` | S3 object key | `Youtube-Downloader/yt-downloader.exe` |
@@ -74,7 +74,10 @@ repository. Example trust relationship snippet (add to the role):
       "Action": "sts:AssumeRoleWithWebIdentity",
       "Condition": {
         "StringLike": {
-          "token.actions.githubusercontent.com:sub": "repo:<owner>/<repo>:ref:refs/heads/main"
+          "token.actions.githubusercontent.com:sub": [
+            "repo:<owner>/<repo>:ref:refs/heads/main",
+            "repo:<owner>/<repo>:environment:production"
+          ]
         },
         "StringEquals": {
           "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
