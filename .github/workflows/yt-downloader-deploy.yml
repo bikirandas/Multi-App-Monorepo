@@ -77,15 +77,9 @@ jobs:
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.9.3
-          # The wrapper captures Terraform's stdout, which can hide all output
-          # in the job log. Turn it off so terraform prints directly.
+          # The wrapper captures Terraform's stdout, which can hide all output    # in the job log. Turn it off so terraform prints directly.
           terraform_wrapper: false
 
-      - name: Confirm Terraform binary
-        run: |
-          Get-Command terraform | Format-List Name, Source, Version
-          terraform version
-          Write-Host "exit code: $LASTEXITCODE"
 
       - name: Configure AWS credentials (assume deployment role)
         uses: aws-actions/configure-aws-credentials@v4
