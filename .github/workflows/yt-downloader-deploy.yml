@@ -98,23 +98,9 @@ jobs:
       - name: Verify AWS identity
         run: aws sts get-caller-identity
 
-      # Diagnostic only: shows whether the Terraform state and target bucket
-      # already exist in AWS, which explains a "no changes" plan.
-      - name: Inspect state and target bucket
-        continue-on-error: true
-        run: |
-          Write-Host "--- State object ---"
-          aws s3 ls "s3://boxndots-terraform-state-dev/yt-downloader/" --region ${{ env.AWS_REGION }}
-          Write-Host "--- Products bucket ---"
-          aws s3 ls "s3://${{ env.BUCKET_NAME }}/" --recursive --region ${{ env.AWS_REGION }}
-
-      - name: Terraform init (reconfigure S3 backend)
+      - name: Terraform init
         working-directory: ${{ env.TERRAFORM_DIR }}
-        env:
-          TF_LOG: DEBUG
-          AWS_LOG_LEVEL: debug
-          AWS_SDK_VERBOSE: true
-        run: terraform init -reconfigure
+        run: terraform init
 
       - name: Terraform validate
         working-directory: ${{ env.TERRAFORM_DIR }}
@@ -126,26 +112,16 @@ jobs:
 
       - name: Terraform plan (preview changes)
         working-directory: ${{ env.TERRAFORM_DIR }}
-        env:
-          TF_LOG: DEBUG
-          AWS_LOG_LEVEL: debug
-          AWS_SDK_VERBOSE: true
         run: |
           terraform plan `
             -var "executable_source_path=${{ github.workspace }}/${{ env.EXE_SOURCE }}"
 
       - name: Terraform apply (create bucket and upload exe)
         working-directory: ${{ env.TERRAFORM_DIR }}
-        env:
-          TF_LOG: DEBUG
-          AWS_LOG_LEVEL: debug
-          AWS_SDK_VERBOSE: true
         run: |
           terraform apply -auto-approve `
             -var "executable_source_path=${{ github.workspace }}/${{ env.EXE_SOURCE }}"
 
       - name: Show deployment outputs
         working-directory: ${{ env.TERRAFORM_DIR }}
-        env:
-          TF_LOG: DEBUG
         run: terraform output
