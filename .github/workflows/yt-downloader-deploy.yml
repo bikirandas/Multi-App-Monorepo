@@ -95,7 +95,7 @@ jobs:
       - name: Terraform apply (create bucket and upload exe)
         working-directory: ${{ env.TERRAFORM_DIR }}
         run: |
-          terraform apply -auto-approve \
+          terraform apply -auto-approve `
             -var "executable_source_path=${{ github.workspace }}/${{ env.EXE_SOURCE }}"
 
       - name: Show deployment outputs
