@@ -1,0 +1,84 @@
+name: Deploy yt-downloader.exe to S3
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "YT-Downloader/**"
+      - ".github/workflows/yt-downloader-deploy.yml"
+  workflow_dispatch:
+
+env:
+  # Target S3 bucket (created by the terraform module in
+  # infrastructure/modules/yt-downloader)
+  BUCKET_NAME: boxndots-products-prod
+
+  # AWS region
+  AWS_REGION: us-east-1
+
+  # S3 object key (path) inside the bucket
+  OBJECT_KEY: Youtube-Downloader/yt-downloader.exe
+
+  # Path to the built executable (relative to repository root)
+  EXE_SOURCE: YT-Downloader/dist/yt-downloader.exe
+
+  # IAM role assumed by GitHub Actions to deploy to AWS
+  DEPLOY_ROLE_ARN: arn:aws:iam::593271843865:role/Boxndots-website-deployment-role
+
+jobs:
+  build-and-deploy:
+    name: Build and deploy yt-downloader.exe
+    runs-on: ubuntu-latest
+
+    # id-token: write is required to assume the IAM role via OIDC
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v7.1.0
+        with:
+          python-version: "3.11"
+
+      - name: Install build dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller pyqt6 yt-dlp
+
+      - name: Build yt-downloader.exe with PyInstaller
+        working-directory: YT-Downloader
+        run: |
+          pyinstaller --noconfirm --clean --onefile --windowed --name yt-downloader \
+            --icon app/icons/yt-downloader-icon.ico \
+            --add-data "app/icons/yt-downloader-icon.png:app/icons" \
+            --add-binary "app/bin/ffmpeg.exe:app/bin" \
+            --add-binary "app/bin/ffprobe.exe:app/bin" \
+            run.py
+
+      - name: Verify the executable was built
+        run: |
+          ls -lh ${{ env.EXE_SOURCE }}
+          file ${{ env.EXE_SOURCE }}
+
+      - name: Configure AWS credentials (assume deployment role)
+        uses: aws-actions/configure-aws-credentials@v6.3.0
+        with:
+          role-to-assume: ${{ env.DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Upload yt-downloader.exe to S3
+        run: |
+          aws s3 cp ${{ env.EXE_SOURCE }} \
+            "s3://${{ env.BUCKET_NAME }}/${{ env.OBJECT_KEY }}" \
+            --region ${{ env.AWS_REGION }}
+
+      - name: Confirm upload
+        run: |
+          aws s3api head-object \
+            --bucket ${{ env.BUCKET_NAME }} \
+            --key ${{ env.OBJECT_KEY }} \
+            --region ${{ env.AWS_REGION }}
