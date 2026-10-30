@@ -84,13 +84,19 @@ jobs:
           role-to-assume: ${{ env.DEPLOY_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Terraform init
+      - name: Terraform init (reconfigure S3 backend)
         working-directory: ${{ env.TERRAFORM_DIR }}
-        run: terraform init
+        run: terraform init -reconfigure
 
       - name: Terraform validate
         working-directory: ${{ env.TERRAFORM_DIR }}
         run: terraform validate
+
+      - name: Terraform plan (preview changes)
+        working-directory: ${{ env.TERRAFORM_DIR }}
+        run: |
+          terraform plan `
+            -var "executable_source_path=${{ github.workspace }}/${{ env.EXE_SOURCE }}"
 
       - name: Terraform apply (create bucket and upload exe)
         working-directory: ${{ env.TERRAFORM_DIR }}
