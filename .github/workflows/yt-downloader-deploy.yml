@@ -77,6 +77,15 @@ jobs:
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.9.3
+          # The wrapper captures Terraform's stdout, which can hide all output
+          # in the job log. Turn it off so terraform prints directly.
+          terraform_wrapper: false
+
+      - name: Confirm Terraform binary
+        run: |
+          Get-Command terraform | Format-List Name, Source, Version
+          terraform version
+          Write-Host "exit code: $LASTEXITCODE"
 
       - name: Configure AWS credentials (assume deployment role)
         uses: aws-actions/configure-aws-credentials@v4
@@ -88,6 +97,16 @@ jobs:
       # letting later Terraform steps silently not run.
       - name: Verify AWS identity
         run: aws sts get-caller-identity
+
+      # Diagnostic only: shows whether the Terraform state and target bucket
+      # already exist in AWS, which explains a "no changes" plan.
+      - name: Inspect state and target bucket
+        continue-on-error: true
+        run: |
+          Write-Host "--- State object ---"
+          aws s3 ls "s3://boxndots-terraform-state-dev/yt-downloader/" --region ${{ env.AWS_REGION }}
+          Write-Host "--- Products bucket ---"
+          aws s3 ls "s3://${{ env.BUCKET_NAME }}/" --recursive --region ${{ env.AWS_REGION }}
 
       - name: Terraform init (reconfigure S3 backend)
         working-directory: ${{ env.TERRAFORM_DIR }}
