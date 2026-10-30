@@ -86,24 +86,42 @@ jobs:
 
       - name: Terraform init (reconfigure S3 backend)
         working-directory: ${{ env.TERRAFORM_DIR }}
+        env:
+          TF_LOG: DEBUG
+          AWS_LOG_LEVEL: debug
+          AWS_SDK_VERBOSE: true
         run: terraform init -reconfigure
 
       - name: Terraform validate
         working-directory: ${{ env.TERRAFORM_DIR }}
+        env:
+          TF_LOG: DEBUG
+          AWS_LOG_LEVEL: debug
+          AWS_SDK_VERBOSE: true
         run: terraform validate
 
       - name: Terraform plan (preview changes)
         working-directory: ${{ env.TERRAFORM_DIR }}
+        env:
+          TF_LOG: DEBUG
+          AWS_LOG_LEVEL: debug
+          AWS_SDK_VERBOSE: true
         run: |
           terraform plan `
             -var "executable_source_path=${{ github.workspace }}/${{ env.EXE_SOURCE }}"
 
       - name: Terraform apply (create bucket and upload exe)
         working-directory: ${{ env.TERRAFORM_DIR }}
+        env:
+          TF_LOG: DEBUG
+          AWS_LOG_LEVEL: debug
+          AWS_SDK_VERBOSE: true
         run: |
           terraform apply -auto-approve `
             -var "executable_source_path=${{ github.workspace }}/${{ env.EXE_SOURCE }}"
 
       - name: Show deployment outputs
         working-directory: ${{ env.TERRAFORM_DIR }}
+        env:
+          TF_LOG: DEBUG
         run: terraform output
