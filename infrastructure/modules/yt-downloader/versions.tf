@@ -12,9 +12,10 @@ terraform {
   # project, under the yt-downloader object path:
   #   s3://boxndots-terraform-state-dev/yt-downloader/terraform.tfstate
   backend "s3" {
-    bucket = "boxndots-terraform-state-dev"
-    key    = "yt-downloader/terraform.tfstate"
-    region = "ap-south-1"
-    encrypt = true
+    bucket     = "boxndots-terraform-state-dev"
+    key        = "yt-downloader/terraform.tfstate"
+    region     = "ap-south-1"
+    encrypt    = true
+    kms_key_id = "alias/boxnddots-kms-dev"
   }
 }
