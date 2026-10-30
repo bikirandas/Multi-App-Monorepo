@@ -25,7 +25,7 @@ resource "aws_s3_bucket" "products" {
     Name        = var.bucket_name
     Environment = var.environment
     ManagedBy   = "Terraform"
-    Project     = "yt-downloader"
+    Project     = "custom-products"
   }
 }
 

@@ -44,12 +44,18 @@ terraform apply \
 ## GitHub Actions deployment
 
 A CI/CD workflow lives at `.github/workflows/yt-downloader-deploy.yml`. On push
-to `main` (or manually via `workflow_dispatch`) it:
+to `main` (when `YT-Downloader/**`, `infrastructure/modules/yt-downloader/**`, or
+the workflow file itself changes) or manually via `workflow_dispatch`, it:
 
 1. Builds `yt-downloader.exe` with PyInstaller.
 2. Assumes the IAM role
    `arn:aws:iam::593271843865:role/Boxndots-website-deployment-role` via OIDC.
-3. Uploads the executable to `s3://boxndots-products-prod/Youtube-Downloader/yt-downloader.exe`.
+3. Runs `terraform init` + `terraform apply -auto-approve` in
+   `infrastructure/modules/yt-downloader`, which:
+   - Creates the S3 bucket `boxndots-products-prod` (public access blocked).
+   - Uploads the built `yt-downloader.exe` to
+     `s3://boxndots-products-prod/Youtube-Downloader/yt-downloader.exe`.
+4. Prints the Terraform outputs (bucket name, object key, object URL).
 
 ### Required IAM trust policy
 
@@ -80,5 +86,23 @@ repository. Example trust relationship snippet (add to the role):
 ```
 
 Replace `<owner>` and `<repo>` with your GitHub owner/repository names. The role
-also needs `s3:PutObject` and `s3:PutObjectAcl` (or equivalent) permissions on
-the `boxndots-products-prod` bucket.
+also needs these permissions on the `boxndots-products-prod` bucket:
+
+- `s3:CreateBucket`
+- `s3:PutObject`
+- `s3:PutObjectAcl`
+- `s3:PutBucketPublicAccessBlock`
+
+### State storage
+
+Terraform state is stored remotely in the project's shared state bucket:
+
+- **Bucket:** `boxndots-terraform-state-dev`
+- **Object path:** `yt-downloader/terraform.tfstate`
+- **Region:** `ap-south-1` (Mumbai)
+- **Encryption:** enabled (`encrypt = true`)
+
+This is configured in `versions.tf` via the `backend "s3"` block. State locking is
+not configured (no DynamoDB table), so avoid running concurrent applies.
+
+
