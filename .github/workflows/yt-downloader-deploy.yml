@@ -33,7 +33,7 @@ jobs:
   build-and-deploy:
     name: Build yt-downloader.exe and deploy infrastructure
     runs-on: windows-latest
-
+    environment: production
     # id-token: write is required to assume the IAM role via OIDC
     permissions:
       id-token: write
