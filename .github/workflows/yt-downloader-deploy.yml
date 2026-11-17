@@ -17,11 +17,8 @@ env:
   # AWS region
   AWS_REGION: ap-south-1
 
-  # S3 object key (path) inside the bucket
-  OBJECT_KEY: Youtube-Downloader/yt-downloader.exe
-
-  # Path to the built executable (relative to repository root)
-  EXE_SOURCE: YT-Downloader/dist/yt-downloader.exe
+  # The versioned file name (yt-downloader-v<version>.exe) is read from
+  # app/version.py at runtime and exported as EXE_NAME in the build step.
 
   # IAM role assumed by GitHub Actions to deploy to AWS
   DEPLOY_ROLE_ARN: arn:aws:iam::593271843865:role/Boxndots-website-deployment-role
@@ -56,10 +53,26 @@ jobs:
           python -m pip install --upgrade pip
           pip install pyinstaller pyqt6 yt-dlp
 
-      - name: Build yt-downloader.exe with PyInstaller
+      # Reads app/version.py and exports EXE_NAME (e.g. yt-downloader-v1.0.0)
+      # for the build, the verify step and the Terraform steps.
+      - name: Read application version
         working-directory: YT-Downloader
         run: |
-          pyinstaller --noconfirm --clean --onefile --windowed --name yt-downloader `
+          $version = python -c "from app.version import __version__; print(__version__)"
+          Write-Host "Application version: $version"
+          "EXE_NAME=yt-downloader-v$version" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
+      # Writes the Windows version resource from app/version.py so the .exe's
+      # File/Product version always matches the version shown in the app.
+      - name: Generate version info for the executable
+        working-directory: YT-Downloader
+        run: python scripts/make_version_info.py version_info.txt
+
+      - name: Build executable with PyInstaller
+        working-directory: YT-Downloader
+        run: |
+          pyinstaller --noconfirm --clean --onefile --windowed --name ${{ env.EXE_NAME }} `
+            --version-file version_info.txt `
             --icon app/icons/yt-downloader-icon.ico `
             --add-data "app/icons/yt-downloader-icon.png;app/icons" `
             --add-binary "app/bin/ffmpeg.exe;app/bin" `
@@ -68,7 +81,7 @@ jobs:
 
       - name: Verify the executable was built
         run: |
-          Get-ChildItem -Path ${{ env.EXE_SOURCE }}
+          Get-ChildItem -Path YT-Downloader/dist/${{ env.EXE_NAME }}.exe
 
       # ------------------------------------------------------------------
       # 2. Deploy infrastructure with Terraform (creates bucket + uploads exe)
@@ -108,13 +121,15 @@ jobs:
         working-directory: ${{ env.TERRAFORM_DIR }}
         run: |
           terraform plan `
-            -var "executable_source_path=${{ github.workspace }}/${{ env.EXE_SOURCE }}"
+            -var "executable_source_path=${{ github.workspace }}/YT-Downloader/dist/${{ env.EXE_NAME }}.exe" `
+            -var "object_key=Youtube-Downloader/${{ env.EXE_NAME }}.exe"
 
       - name: Terraform apply (create bucket and upload exe)
         working-directory: ${{ env.TERRAFORM_DIR }}
         run: |
           terraform apply -auto-approve `
-            -var "executable_source_path=${{ github.workspace }}/${{ env.EXE_SOURCE }}"
+            -var "executable_source_path=${{ github.workspace }}/YT-Downloader/dist/${{ env.EXE_NAME }}.exe" `
+            -var "object_key=Youtube-Downloader/${{ env.EXE_NAME }}.exe"
 
       - name: Show deployment outputs
         working-directory: ${{ env.TERRAFORM_DIR }}
