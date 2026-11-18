@@ -1,4 +1,4 @@
-"""Main application window with YouTube search and download functionality."""
+"""Main application window with video search and download functionality."""
 
 from __future__ import annotations
 
@@ -39,7 +39,7 @@ from app.version import __version__
 
 
 class SearchTab(QWidget):
-    """Tab widget for YouTube search and queue management."""
+    """Tab widget for video search and queue management."""
 
     def __init__(self, settings: AppSettings, parent: QWidget | None = None) -> None:
         super().__init__(parent)
@@ -55,7 +55,7 @@ class SearchTab(QWidget):
         layout.setSpacing(12)
 
         # Search section
-        search_group = QGroupBox("Search YouTube")
+        search_group = QGroupBox("Search Videos")
         search_layout = QVBoxLayout(search_group)
 
         # Search input row
@@ -88,7 +88,7 @@ class SearchTab(QWidget):
 
         search_layout.addLayout(search_row)
 
-        self.search_status = QLabel("Enter a search query to find YouTube videos")
+        self.search_status = QLabel("Enter a search query to find videos")
         self.search_status.setStyleSheet("color: #aaa; font-size: 11px;")
         search_layout.addWidget(self.search_status)
 
@@ -216,7 +216,7 @@ class SearchTab(QWidget):
         self._update_queue_count()
 
     def _start_search(self) -> None:
-        """Start a YouTube search."""
+        """Start a video search."""
         query = self.search_input.text().strip()
         if not query:
             QMessageBox.warning(self, "Empty Query", "Please enter a search query.")
@@ -566,7 +566,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.settings = AppSettings()
 
-        self.setWindowTitle(f"YouTube to MP3 / MP4 Downloader v{__version__}")
+        self.setWindowTitle(f"Boxndots Music & Video Downloader (BMVD) v{__version__}")
         self.setMinimumSize(900, 700)
         icon_path = resolve_icon_path()
         if icon_path:
@@ -586,7 +586,7 @@ class MainWindow(QMainWindow):
         header_layout = QHBoxLayout(header)
         header_layout.setContentsMargins(14, 8, 14, 8)
 
-        title_label = QLabel(f"YouTube Downloader v{__version__}")
+        title_label = QLabel(f"Boxndots Music && Video Downloader (BMVD) v{__version__}")
         title_label.setStyleSheet("font-weight: bold; font-size: 16px; color: #fff;")
         header_layout.addWidget(title_label)
 

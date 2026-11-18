@@ -1,4 +1,4 @@
-"""YouTube search functionality using yt-dlp."""
+"""Video search functionality using yt-dlp."""
 
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 @dataclass
 class SearchResult:
-    """A single search result from YouTube."""
+    """A single video search result."""
 
     video_id: str
     url: str
@@ -91,7 +91,7 @@ class SearchResult:
 
 
 class SearchWorker(QObject):
-    """Worker to perform YouTube search in background thread."""
+    """Worker to perform video search in background thread."""
 
     started = pyqtSignal()
     progress = pyqtSignal(str)  # Status message
@@ -118,7 +118,7 @@ class SearchWorker(QObject):
     def run(self) -> None:
         """Execute the search."""
         self.started.emit()
-        self.progress.emit(f"Searching YouTube for: {self.query}")
+        self.progress.emit(f"Searching for: {self.query}")
 
         # Note: Don't use extractor_args for search - it can interfere with the search extractor
         # Use extract_flat: 'in_playlist' to get metadata without downloading
@@ -182,7 +182,7 @@ class SearchWorker(QObject):
             if "Sign in" in error_msg or "login" in error_msg.lower():
                 self.completed.emit(
                     False,
-                    "YouTube requires authentication. Please configure browser cookies in Settings.",
+                    "Authentication required. Please configure browser cookies in Settings.",
                 )
             else:
                 self.completed.emit(False, f"Search failed: {error_msg}")
@@ -215,7 +215,7 @@ class SearchController:
         on_completed: callable = None,
     ) -> None:
         """
-        Start a YouTube search.
+        Start a video search.
 
         Args:
             query: Search query string

@@ -13,7 +13,7 @@ import re
 import sys
 from pathlib import Path
 
-APP_NAME = "YouTube to MP3 / MP4 Downloader"
+APP_NAME = "Boxndots Music & Video Downloader (BMVD)"
 INTERNAL_NAME = "yt-downloader"
 COMPANY = "Bikiran Das"
 COPYRIGHT = "Copyright (c) Bikiran Das"

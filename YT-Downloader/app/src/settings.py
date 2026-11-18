@@ -14,7 +14,7 @@ from PyQt6.QtCore import QSettings
 
 @dataclass
 class AuthConfig:
-    """Authentication configuration for YouTube access."""
+    """Authentication configuration for video site access."""
 
     browser: str | None = None  # Browser to extract cookies from
     cookies_file: str | None = None  # Path to cookies.txt file

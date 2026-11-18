@@ -1,5 +1,8 @@
 # -*- mode: python ; coding: utf-8 -*-
+import subprocess
+import sys
 
+subprocess.run([sys.executable, 'scripts/make_version_info.py', 'version_info.txt'], check=True)
 
 a = Analysis(
     ['run.py'],
@@ -36,4 +39,5 @@ exe = EXE(
     codesign_identity=None,
     entitlements_file=None,
     icon=['app\\icons\\yt-downloader-icon.ico'],
+    version='version_info.txt',
 )

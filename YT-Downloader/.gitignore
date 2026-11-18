@@ -1,3 +1,4 @@
 /dist/*
 /build/*
+/version_info.txt
 .idea/*

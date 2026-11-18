@@ -45,7 +45,7 @@ class SettingsDialog(QDialog):
         layout.setSpacing(16)
 
         # Authentication section
-        auth_group = QGroupBox("YouTube Authentication (Optional)")
+        auth_group = QGroupBox("Authentication (Optional)")
         auth_layout = QVBoxLayout(auth_group)
 
         auth_description = QLabel(
@@ -205,14 +205,14 @@ class SettingsDialog(QDialog):
                     self,
                     "Success",
                     f"Successfully extracted cookies from {browser.capitalize()}!\n\n"
-                    "Your YouTube login session will be used for searches and downloads.",
+                    "Your login session will be used for searches and downloads.",
                 )
             else:
                 QMessageBox.warning(
                     self,
                     "Failed",
                     f"Could not extract cookies from {browser.capitalize()}.\n\n"
-                    f"Make sure you're logged into YouTube in this browser.\n\n"
+                    f"Make sure you're logged into the video site in this browser.\n\n"
                     f"Error: {message}",
                 )
         finally:

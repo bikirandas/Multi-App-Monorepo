@@ -1,17 +1,17 @@
-# YouTube Downloader (PyQt6)
+# Boxndots Music & Video Downloader (BMVD)
 
 ## Introduction
-YouTube Downloader is a desktop application built with **PyQt6** that lets you download YouTube content to your local machine as either:
+Boxndots Music & Video Downloader (BMVD) is a desktop application built with **PyQt6** that lets you download video content to your local machine as either:
 
 - **MP3** (audio only)
 - **MP4** (video with audio)
 
-The app provides a simple UI with YouTube search, download queue management, URL input, output folder selection, progress tracking, and status logs so downloads are easy to manage without using terminal commands.
+The app provides a simple UI with video search, download queue management, URL input, output folder selection, progress tracking, and status logs so downloads are easy to manage without using terminal commands.
 
 ## Features
 
-### 🔍 YouTube Search (New in v2.0)
-- **Search YouTube directly** from within the app — no need to open a browser
+### 🔍 Video Search (New in v2.0)
+- **Search for videos directly** from within the app — no need to open a browser
 - View search results with thumbnails, titles, channels, duration, and view counts
 - Select format (MP3/MP4) and bitrate for each video before adding to queue
 - **Works without login** for most videos
@@ -143,6 +143,12 @@ Compress-Archive -Path .\dist\yt-downloader.exe,.\dist\Install-YT-Downloader.ps1
 5. Click **Save** — your login will persist across app restarts.
 
 ## Changelog
+
+### v2.0.1
+- ✨ **Renamed** the application to **Boxndots Music & Video Downloader (BMVD)** across the UI, window title, installer shortcuts, and exe properties
+- ✨ **Version** updated to 2.0.1 and embedded in the `.exe` file properties
+- ✨ **Icon** updated to the new Boxndots logo for the `.exe`, window, and taskbar
+- Removed "YouTube" from the UI everywhere except the Direct URL tab
 
 ### v2.0.0
 - ✨ **YouTube Search**: Search videos directly from the app
